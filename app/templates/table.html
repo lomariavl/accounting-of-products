@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Отчет производства</title>
+</head>
+<body>
+<h2>Отчет производства</h2>
+
+<table border="1" cellpadding="5">
+    <tr>
+        <th rowspan="2">Дата</th>
+        <th rowspan="2">Сотрудник</th>
+        <th colspan="2">Изготовлено</th>
+        <th colspan="2">Брак</th>
+    </tr>
+    <tr>
+        <th>a</th>
+        <th>b</th>
+        <th>a</th>
+        <th>b</th>
+    </tr>
+    {% for item in items %}
+        <tr>
+            <td>{{ item.created_at }}</td>
+            <td>{{ item.username }}</td>
+            <td>{{ item.a }}</td>
+            <td>{{ item.b }}</td>
+            <td>{{ item.a1 }}</td>
+            <td>{{ item.b1 }}</td>
+        </tr>
+    {% endfor %}
+</table>
+
+</body>
+</html>
