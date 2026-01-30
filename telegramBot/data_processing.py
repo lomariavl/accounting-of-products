@@ -14,7 +14,7 @@ class DataProcessing:
     db_keys = {
         'а': 'a',
         'б': 'b',
-        'бр': 'bp'
+        'р': 'p'
     }
 
     @staticmethod
@@ -69,6 +69,9 @@ class DataProcessing:
 
     @staticmethod
     def data_conversion(text: str) -> Dict:
+        new_text = ''
+        for k, v in DataProcessing.db_keys.items():
+            new_text = text.replace(k, v)
         result = findall(DataProcessing.PATTERN, text, re.I)
         data = {(DataProcessing.db_keys[k] if k in DataProcessing.db_keys else k): v for k, v in dict(result).items()}
         return data
@@ -90,12 +93,12 @@ class DataProcessing:
 
         return data
 
-    @staticmethod
-    def get_key_by_value(d, value):
-        for k, v in d.items():
-            if v == value:
-                return k
-        return None
+    # @staticmethod
+    # def get_key_by_value(d, value):
+    #     for k, v in d.items():
+    #         if v == value:
+    #             return k
+    #     return None
 
     # @staticmethod
     # def get_product_type_from_db() -> set:
