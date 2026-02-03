@@ -5,7 +5,7 @@ import telebot
 from dotenv import load_dotenv
 from telebot.types import Message, BotCommand
 
-from data_processing import DataProcessing
+from ex import DatabaseHandler, DataHandler
 
 load_dotenv()
 bot = telebot.TeleBot(os.getenv('TELEGRAMBOT'))
@@ -21,7 +21,7 @@ bot.set_my_commands(commands)
 @bot.message_handler(commands=['info'])
 def send_welcome(message):
     user_id = message.from_user.id
-    text = DataProcessing.get_current_data_from_db(user_id)
+    text = DatabaseHandler.get_data_from_db(user_id)
     bot.reply_to(message, text=text)
 
 
@@ -45,20 +45,21 @@ def get_photo(message):
             new_file.write(photo_bytes)
 
 
-@bot.message_handler(regexp=DataProcessing.PATTERN)
+@bot.message_handler(regexp=DataHandler.PATTERN)
 def get_data(message: Message):
     try:
         from_user = message.from_user
-        user = DataProcessing.user_format(from_user.username, from_user.first_name, from_user.last_name)
-        text = message.text
+        username = DataHandler.username_format(from_user.username, from_user.first_name, from_user.last_name)
         user_id = from_user.id
-        # logging.info(from_user, user, text, user_id, ' successful get.')
+        text_message = message.text
+        logging.warning(f'Data was got.\n{username} {user_id}\ntext_message={text_message}')
 
-        DataProcessing().fill_data_in_db(user, user_id, text)
-        text = DataProcessing.get_current_data_from_db(user_id)
+        DatabaseHandler.add_data_in_db(username, user_id, text_message)
+        text = DatabaseHandler.get_data_from_db(user_id)
         bot.send_message(chat_id=message.chat.id, text=text, reply_to_message_id=message.id)
     except Exception:
         bot.send_message(message.chat.id, f'Что-то пошло не так.')
+        logging.error(Exception)
         raise
 
 
