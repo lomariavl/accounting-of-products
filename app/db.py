@@ -2,17 +2,17 @@ import os
 from datetime import datetime
 from typing import Annotated
 
-import psycopg2
 from dotenv import load_dotenv
 from fastapi import Depends
 from sqlalchemy import Date
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlmodel import SQLModel, Field, create_engine, Session, Relationship, Column, func
 
 
 class ProductType(SQLModel, table=True):
     name: str = Field(default=None, primary_key=True)
     description: str = Field(default=None)
-    storages: list['Storage'] = Relationship(back_populates='producttype')
+    storages: list['Storage'] = Relationship(back_populates="producttype")
 
 
 class Storage(SQLModel, table=True):
@@ -23,9 +23,14 @@ class Storage(SQLModel, table=True):
         sa_column=Column(Date, server_default=func.current_date())
     )
     quantity: int
+    comment: str | None = Field(default=None)
+    photo_path: list[str] | None = Field(
+        default=None,
+        sa_column=Column(JSONB, nullable=True)
+    )
 
     ab: str = Field(foreign_key='producttype.name')
-    product_type: ProductType = Relationship(back_populates='storages')
+    producttype: ProductType = Relationship(back_populates='storages')
 
 
 load_dotenv()
