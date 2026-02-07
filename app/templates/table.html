@@ -1,36 +1,137 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <style>
+        .gallery {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .gallery.hidden {
+            display: none;
+        }
+
+        .gallery img {
+            max-width: 95%;
+            max-height: 95%;
+            object-fit: contain;
+        }
+
+        .gallery .close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 30px;
+            color: white;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .gallery .nav {
+            position: absolute;
+            top: 50%;
+            font-size: 60px;
+            color: white;
+            background: none;
+            border: none;
+            cursor: pointer;
+            transform: translateY(-50%);
+        }
+
+        .gallery .left { left: 30px; }
+        .gallery .right { right: 30px; }
+    </style>
     <meta charset="UTF-8">
     <title>Отчет производства</title>
 </head>
+<script>
+    const photosData = {{ items | tojson }};
+    let currentPhotos = [];
+    let currentIndex = 0;
+
+    function openGallery(rowIndex) {
+        currentPhotos = photosData[rowIndex].photo_path || [];
+        currentIndex = 0;
+        showPhoto();
+        document.getElementById("gallery").classList.remove("hidden");
+    }
+
+    function closeGallery() {
+        document.getElementById("gallery").classList.add("hidden");
+    }
+
+    function showPhoto() {
+        document.getElementById("gallery-img").src = "/" + currentPhotos[currentIndex];
+    }
+
+    function nextPhoto() {
+        if (currentIndex < currentPhotos.length - 1) {
+            currentIndex++;
+            showPhoto();
+        }
+    }
+
+    function prevPhoto() {
+        if (currentIndex > 0) {
+            currentIndex--;
+            showPhoto();
+        }
+    }
+</script>
 <body>
 <h2>Отчет производства</h2>
-
 <table border="1" cellpadding="5">
     <tr>
         <th rowspan="2">Дата</th>
         <th rowspan="2">Сотрудник</th>
         <th colspan="2">Изготовлено</th>
-        <th colspan="2">Брак</th>
+        <th rowspan="2">Брак</th>
+        <th rowspan="2">Фотографии</th>
+        <th rowspan="2">Комментарий</th>
     </tr>
     <tr>
         <th>a</th>
         <th>b</th>
-        <th>a</th>
-        <th>b</th>
     </tr>
     {% for item in items %}
-        <tr>
-            <td>{{ item.created_at }}</td>
-            <td>{{ item.username }}</td>
-            <td>{{ item.a }}</td>
-            <td>{{ item.b }}</td>
-            <td>{{ item.a1 }}</td>
-            <td>{{ item.b1 }}</td>
-        </tr>
+    <tr>
+        <td>{{ item.created_at }}</td>
+        <td>{{ item.username }}</td>
+        <td>{{ item.a }}</td>
+        <td>{{ item.b }}</td>
+        <td>{{ item.bp }}</td>
+        <td>
+            {% set photos = item.photo_path or [] %}
+            {% if photos %}
+            <a href="#" onclick="openGallery({{ loop.index0 }}); return false;">
+                {{ photos | length }}
+            </a>
+            {% else %}
+            {% endif %}
+        </td>
+        <td>
+            {% set comment = item.comment or [] %}
+            {% if comment %}
+            <a>{{comment}}</a>
+            {% else %}
+            {% endif %}
+        </td>
+    </tr>
     {% endfor %}
 </table>
-
+<div id="gallery" class="gallery hidden">
+    <button class="close" onclick="closeGallery()">✕</button>
+    <button class="nav left" onclick="prevPhoto()">‹</button>
+    <img id="gallery-img">
+    <button class="nav right" onclick="nextPhoto()">›</button>
+</div>
 </body>
 </html>
+
+

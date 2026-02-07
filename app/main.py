@@ -1,12 +1,16 @@
+import datetime
+
 from fastapi import FastAPI, Request, Depends
 from fastapi.templating import Jinja2Templates
 from sqlmodel import Session, text
+from starlette.staticfiles import StaticFiles
 
 from db import get_session, Storage
 from db import create_db_and_tables
 
 app = FastAPI()
 templates = Jinja2Templates(directory='templates')
+app.mount("/imgs", StaticFiles(directory="/home/maria/Documents/Products/telegramBot/imgs"), name="imgs")
 
 
 @app.on_event('startup')
@@ -20,14 +24,23 @@ def read_table(request: Request, db: Session = Depends(get_session)):
        SELECT
             created_at,
             username,
-            SUM(CASE WHEN ab = 'A' THEN quantity END) AS A,
-            SUM(CASE WHEN ab = 'B' THEN quantity END) AS B,
-            SUM(CASE WHEN ab = 'A1' THEN quantity END) AS A1,
-            SUM(CASE WHEN ab = 'B1' THEN quantity END) AS B1
+            comment,
+            SUM(CASE WHEN ab = 'a' THEN quantity END) AS a,
+            SUM(CASE WHEN ab = 'b' THEN quantity END) AS b,
+            SUM(CASE WHEN ab = 'bp' THEN quantity END) AS bp,
+            photo_path
         FROM storage
-        GROUP BY created_at, username
-        ORDER BY created_at, username;"""
-    items = db.connection().execute(text(query)).all()
+        GROUP BY created_at, username, comment, photo_path
+        ORDER BY created_at DESC;"""
+    rows  = db.connection().execute(text(query)).all()
+    items = []
+    for row in rows:
+        d = dict(row._mapping)
+
+        if isinstance(d.get("created_at"), (datetime.date, datetime.datetime)):
+            d["created_at"] = d["created_at"].isoformat()
+
+        items.append(d)
     print(items)
 
     return templates.TemplateResponse("table.html", {
