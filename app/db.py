@@ -47,20 +47,4 @@ def get_session():
         yield session
 
 
-# def flip_table(session: Session):
-#     session = get_session()
-#     result = session.execute(
-#     """
-#    SELECT
-#         created_at,
-#         username,
-#         SUM(CASE WHEN ab = 'A' THEN quantity END) AS A,
-#         SUM(CASE WHEN ab = 'B' THEN quantity END) AS B,
-#         SUM(CASE WHEN ab = 'A1' THEN quantity END) AS A1,
-#         SUM(CASE WHEN ab = 'B1' THEN quantity END) AS B1
-#     FROM storage
-#     GROUP BY created_at, username
-#     ORDER BY created_at, username;""").all()
-#     return result
-
 SessionDep = Annotated[Session, Depends(get_session)]

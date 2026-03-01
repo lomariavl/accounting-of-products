@@ -5,12 +5,12 @@ from fastapi.templating import Jinja2Templates
 from sqlmodel import Session, text
 from starlette.staticfiles import StaticFiles
 
-from db import get_session, Storage
 from db import create_db_and_tables
+from db import get_session
 
 app = FastAPI()
 templates = Jinja2Templates(directory='templates')
-app.mount("/imgs", StaticFiles(directory="/home/maria/Documents/Products/telegramBot/imgs"), name="imgs")
+app.mount("/imgs", StaticFiles(directory="/imgs"), name="imgs")
 
 
 @app.on_event('startup')
@@ -32,7 +32,7 @@ def read_table(request: Request, db: Session = Depends(get_session)):
         FROM storage
         GROUP BY created_at, username, comment, photo_path
         ORDER BY created_at DESC;"""
-    rows  = db.connection().execute(text(query)).all()
+    rows = db.connection().execute(text(query)).all()
     items = []
     for row in rows:
         d = dict(row._mapping)
