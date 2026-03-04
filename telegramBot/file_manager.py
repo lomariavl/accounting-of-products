@@ -7,8 +7,8 @@ from sqlalchemy import update, and_, case
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlmodel import Session
 
-from app.db import Storage
-from app.db import engine
+from db import Storage
+from db import engine
 
 
 class FileManager:
