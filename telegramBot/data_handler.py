@@ -6,9 +6,10 @@ class DataHandler:
     PRODUCT_TYPE_KEYS = {
         'а': 'a',
         'б': 'b',
-        'р': 'p'
+        'р': 'p',
+        'r': 'p'
     }
-    PATTERN = r'\b([abpабрАБР]+)(\d+)\b'
+    PATTERN = r'\b([abpабрbrАБР]+)(\d+)\b'
 
     @staticmethod
     def username_format(username: str, first_name, last_name, without_at: bool = False) -> str:
